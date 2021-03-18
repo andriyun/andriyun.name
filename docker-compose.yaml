@@ -1,0 +1,65 @@
+version: '3.7'
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+volumes:
+  mysql:
+    driver: local
+  os2web:
+    driver: local
+
+services:
+
+  # General application container.
+  # Could be run with many replica on demand.
+  php:
+    # Both php and CLI containers should use the same container.
+    #build: ./.docker/php
+    image: drupal:php8.0-apache
+    volumes:
+      - ./:/opt/drupal
+    depends_on:
+      - db
+    ports:
+      - "${LOCALHOST_PORT}:80"
+    networks:
+      - backend
+      - frontend
+    restart: always
+    environment:
+      ## Environment sensitive settings. See .env file.
+      - MYSQL_HOSTNAME=${MYSQL_HOSTNAME}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_PORT=${MYSQL_PORT}
+
+  db:
+    image: mariadb:latest
+    volumes:
+      - ./.docker/mariadb/data:/var/lib/mysql:delegated
+    restart: always
+    environment:
+      ## Environment sensitive settings. See .env file.
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    networks:
+      - backend
+
+  # SOLR Docker service.
+  ## On the first run on local environment you need to create SOLR core
+  ## Run command below to create it.
+  ## docker-compose exec solr bash -c "bin/solr create_core -c os2web-core -d /solr-config"
+  #solr:
+  #  image: solr:8.5.2
+  #  volumes:
+  #    - ./.docker/solr/config:/solr-config:delegated
+  #  restart: always
+  #  networks:
+  #    - backend

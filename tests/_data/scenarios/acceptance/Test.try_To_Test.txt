@@ -1,0 +1,18 @@
+I WANT TO TRY TO TEST
+
+I am on page '/' 
+I see 'Drush Site-Install' 
+I make screenshot "$prefix . 'front-page' 
+I am on page '/user/login' 
+I see 'Log in' 
+I see 'Log out' 
+I see 'admin' 
+I see 'Member for' 
+I make screenshot "$prefix . 'user-page' 
+I am on page '/node/add/article' 
+I fill field 'title[0][value]'," $title" 
+I make screenshot "$prefix . 'article-node-form' 
+I click 'Save' 
+I see "$title" 
+I make screenshot "$prefix . 'article-node-page'
+
